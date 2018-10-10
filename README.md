@@ -1,8 +1,15 @@
-# What is decadebot?
-基本的にはクラウド上のVMを操作するためのbotである。
- #bot_test チャンネルに生息してます。
+#A What is decadebot?
+ISUCONの勉強をした際に一々Vmを作り直すのが面倒さ臭かったので、
+さくらのクラウド上VMの操作自動化するために作ったbot
+~基本的にはクラウド上のVMを操作するためのbotである。~
+~#bot_test チャンネルに生息してます。~
 
-scriptはこちら　http://gitea.kanakomi.com/typo-master/decadebot
+
+中身はusacloudを使ってるだけ。
+
+
+
+
 ## ベンチマーク実行
 対象VM内に設置してあるベンチマークスクリプトをたたきます。
 実行のためには条件がいくつかあります。
