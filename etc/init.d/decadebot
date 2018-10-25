@@ -1,0 +1,75 @@
+#!/bin/bash
+# chkconfig: - 85 15
+
+export HUBOT_SLACK_TOKEN=xoxb-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+export HUBOT_SLACK_BOTNAME=decadebot
+export PORT=9999
+
+DIR="/data/$HUBOT_SLACK_BOTNAME"
+prog=$HUBOT_SLACK_BOTNAME
+pidfile=${PIDFILE-/var/run/${HUBOT_SLACK_BOTNAME}.pid}
+lockfile="/var/lock/subsys/${HUBOT_SLACK_BOTNAME}.log"
+RETVAL=0
+
+start() {
+        if [ -f ${lockfile} ] ;then
+                echo $prog: is Working
+                exit 1
+        fi
+
+	cd $DIR
+	BINARY="bin/hubot"
+	RUN_OPTIONS="${BINARY} --adapter slack"
+	RUNNER="$(${RUN_OPTIONS} >> /var/log/${HUBOT_SLACK_BOTNAME}.log & )"
+        echo
+
+        touch ${lockfile}
+        PID=$(ps aux |grep "bin/hubot"| grep ${HUBOT_SLACK_BOTNAME} | grep -v grep | head -1 |awk '{print $2}')
+	  for i in {1..10} ;do
+	    if [ "$PID" == "" ] ;then 
+	      sleep 1
+	      PID=$(ps aux |grep "bin/hubot"| grep ${HUBOT_SLACK_BOTNAME} | grep -v grep | head -1 |awk '{print $2}')
+	    else 
+	      continue
+	    fi
+	  done
+        echo ${PID} > ${pidfile}
+
+        echo -n $"Starting $prog: "
+        return $RETVAL
+        rm -f ${lockfile} ${pidfile}
+}
+
+stop() {
+        [ -f ${pidfile} ] || return 0
+        echo -n $"Stopping $prog: "
+        PID=$(cat ${pidfile})
+        kill -9 $PID
+        RETVAL=$?
+        echo
+        rm -f ${lockfile} ${pidfile}
+}
+
+
+
+case "$1" in
+  start)
+        start
+        ;;
+  stop)
+        stop
+        ;;
+  restart)
+        stop
+        start
+        ;;
+  *)
+        echo $"Usage: $prog {status|start|stop|restart}"
+        RETVAL=2
+esac
+
+exit
+
+
+exit $RETVAL
+
